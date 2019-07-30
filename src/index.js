@@ -89,7 +89,7 @@ async function fetchRandom() {
     return items[Math.floor(Math.random() * items.length)];
   };
 
-  for (var i = 0; i < 150000; i += 1) {
+  for (var i = 0; i < 111111; i += 1) {
     await getImage(_(topTypes), _(accessoriesTypes), _(hairColors), _(facialHairColors), _(facialHairTypes), _(clotheTypes), _(clotheColors), _(eyeTypes), _(eyebrowTypes), _(mouthTypes), _(skinColors));
     count += 1;
   }
