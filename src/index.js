@@ -2,7 +2,7 @@ const axios = require('axios');
 const sharp = require('sharp');
 const fs = require('fs');
 
-var topTypes = ['NoHair', 'Eyepatch', 'Hat', 'Hijab', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'LongHairBigHair', 'LongHairBob', 'LongHairBun', 'LongHairCurly', 'LongHairCurvy', 'LongHairDreads', 'LongHairFrida', 'LongHairFro', 'LongHairFroBand', 'LongHairNotTooLong', 'LongHairShavedSides', 'LongHairMiaWallace', 'LongHairStraight', 'LongHairStraight2', 'LongHairStraightStrand', 'ShortHairDreads01', 'ShortHairDreads02', 'ShortHairFrizzle', 'ShortHairShaggyMullet', 'ShortHairShortCurly', 'ShortHairShortFlat', 'ShortHairShortRound', 'ShortHairShortWaved', 'ShortHairSides', 'ShortHairTheCaesar', 'ShortHairTheCaesarSidePart'];
+var topTypes = ['NoHair', 'Hat', 'Hijab', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'LongHairBigHair', 'LongHairBob', 'LongHairBun', 'LongHairCurly', 'LongHairCurvy', 'LongHairDreads', 'LongHairFrida', 'LongHairFro', 'LongHairFroBand', 'LongHairNotTooLong', 'LongHairShavedSides', 'LongHairMiaWallace', 'LongHairStraight', 'LongHairStraight2', 'LongHairStraightStrand', 'ShortHairDreads01', 'ShortHairDreads02', 'ShortHairFrizzle', 'ShortHairShaggyMullet', 'ShortHairShortCurly', 'ShortHairShortFlat', 'ShortHairShortRound', 'ShortHairShortWaved', 'ShortHairSides', 'ShortHairTheCaesar', 'ShortHairTheCaesarSidePart'];
 var accessoriesTypes = ['Blank', 'Kurt', 'Prescription01', 'Prescription02', 'Round', 'Sunglasses', 'Wayfarers'];
 var hairColors = ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'PastelPink', 'Platinum', 'Red', 'SilverGray'];
 var facialHairTypes = ['Blank', 'BeardMedium', 'BeardLight', 'BeardMagestic', 'MoustacheFancy', 'MoustacheMagnum'];
@@ -16,10 +16,12 @@ var skinColors = ['Tanned', 'Yellow', 'Pale', 'Light', 'Brown', 'DarkBrown', 'Bl
 var count = 0;
 var total = topTypes.length * accessoriesTypes.length * hairColors.length * facialHairTypes.length * facialHairColors.length * clotheTypes.length * clotheColors.length * eyeTypes.length * eyebrowTypes.length * mouthTypes.length * skinColors.length;
 
+var path = './avatar/';
+
 async function getImage(topType, accessoriesType, hairColor, facialHairColor, facialHairType, clotheType, clotheColor, eyeType, eyebrowType, mouthType, skinColor) {
   try {
-    var fileName = `./avatar/t${count}.png`;
-    var dFileName = `./avatar/${count}.png`;
+    var fileName = `${path}t${count}.png`;
+    var dFileName = `${path}${count}.png`;
     if (fs.existsSync(dFileName)) {
       return;
     }
@@ -49,7 +51,6 @@ async function getImage(topType, accessoriesType, hairColor, facialHairColor, fa
         fs.unlink(fileName);
       }, 1000);
     });
-
     console.log(`${count}/${total} ${((count / total) * 100).toFixed(3)}`);
   } catch (error) {
     console.error(error);
@@ -89,10 +90,41 @@ async function fetchRandom() {
     return items[Math.floor(Math.random() * items.length)];
   };
 
-  for (var i = 0; i < 111111; i += 1) {
+  for (var i = 0; i < 111112; i += 1) {
     await getImage(_(topTypes), _(accessoriesTypes), _(hairColors), _(facialHairColors), _(facialHairTypes), _(clotheTypes), _(clotheColors), _(eyeTypes), _(eyebrowTypes), _(mouthTypes), _(skinColors));
     count += 1;
   }
 }
 
-fetchRandom();
+function checkFiles() {
+  fs.readdir(path, function (err, files) {
+    if (err) {
+      console.error('Could not list the directory.', err);
+      process.exit(1);
+    }
+    files.forEach(function (file) {
+      if (file[0] === 't') {
+        console.error('Invalid file ' + file);
+      }
+      fs.stat(path + file, function (error, stat) {
+        if (error) {
+          console.error('Error stating file.', error);
+          return;
+        }
+
+        if (stat.size < 1) {
+          console.error('No file size ' + file);
+        }
+      });
+    });
+  });
+}
+
+switch (process.argv[2]) {
+  case 'c':
+    checkFiles(); break;
+  case 'a':
+    fetchAll(); break;
+  default:
+    fetchRandom();
+}
